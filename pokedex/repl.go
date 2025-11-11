@@ -8,25 +8,8 @@ import (
 )
 
 func cleanInput(text string) []string {
-	result := []string{}
-	buffer := ""
-
 	text = strings.ToLower(text)
-
-	for _, letter := range text {
-		if letter != ' ' {
-			buffer += string(letter)
-		} else if buffer != "" {
-			result = append(result, buffer)
-			buffer = ""
-		}
-	}
-
-	if buffer != "" {
-		result = append(result, buffer)
-	}
-
-	return result
+	return strings.Fields(text)
 }
 
 type cliCommand struct {

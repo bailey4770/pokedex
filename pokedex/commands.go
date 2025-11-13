@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/bailey4770/pokedex/internal/pokeapi"
@@ -26,8 +27,8 @@ func commandHelp(commands map[string]cliCommand) func(cfg *config) error {
 }
 
 func commandMap(cfg *config) error {
-	if url := cfg.currentURL; url != nil {
-		locationData, err := pokeapi.GetData[pokeapi.LocationResponse](&cfg.pokeapiClient, *url, cfg.cache)
+	if cfg.nextURL != "" {
+		locationData, err := pokeapi.GetData[pokeapi.LocationResponse](&cfg.pokeapiClient, cfg.nextURL, cfg.cache)
 		if err != nil {
 			return err
 		}
@@ -36,9 +37,18 @@ func commandMap(cfg *config) error {
 			fmt.Println(item.Name)
 		}
 
-		cfg.prevURL = locationData.Previous
-		cfg.currentURL = cfg.nextURL
-		cfg.nextURL = locationData.Next
+		if locationData.Previous == nil {
+			cfg.prevURL = ""
+		} else {
+			cfg.prevURL = *locationData.Previous
+		}
+		if locationData.Next == nil {
+			cfg.nextURL = ""
+		} else {
+			cfg.nextURL = *locationData.Next
+		}
+
+		log.Printf("Next URL: %s, prevURL: %s", cfg.nextURL, cfg.prevURL)
 
 		return nil
 
@@ -48,8 +58,8 @@ func commandMap(cfg *config) error {
 }
 
 func commandMapb(cfg *config) error {
-	if url := cfg.prevURL; url != nil {
-		locationData, err := pokeapi.GetData[pokeapi.LocationResponse](&cfg.pokeapiClient, *url, cfg.cache)
+	if cfg.prevURL != "" {
+		locationData, err := pokeapi.GetData[pokeapi.LocationResponse](&cfg.pokeapiClient, cfg.prevURL, cfg.cache)
 		if err != nil {
 			return err
 		}
@@ -58,9 +68,16 @@ func commandMapb(cfg *config) error {
 			fmt.Println(item.Name)
 		}
 
-		cfg.nextURL = cfg.currentURL
-		cfg.currentURL = cfg.prevURL
-		cfg.prevURL = locationData.Previous
+		if locationData.Next == nil {
+			cfg.nextURL = ""
+		} else {
+			cfg.nextURL = *locationData.Next
+		}
+		if locationData.Previous == nil {
+			cfg.prevURL = ""
+		} else {
+			cfg.prevURL = *locationData.Next
+		}
 
 		return nil
 
@@ -75,7 +92,7 @@ func commandExplore(cfg *config) error {
 		return fmt.Errorf("explore command takes one location area argument")
 	}
 
-	url := *cfg.baseURL + args[0]
+	url := cfg.baseURL + args[0]
 	pokemonData, err := pokeapi.GetData[pokeapi.PokemonListResponse](&cfg.pokeapiClient, url, cfg.cache)
 	if err != nil {
 		return err

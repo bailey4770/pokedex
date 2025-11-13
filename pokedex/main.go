@@ -9,10 +9,9 @@ import (
 
 type config struct {
 	pokeapiClient pokeapi.Client
-	baseURL       *string
-	currentURL    *string
-	nextURL       *string
-	prevURL       *string
+	baseURL       string
+	nextURL       string
+	prevURL       string
 	cache         *pokecache.Cache
 	args          []string
 }
@@ -20,15 +19,15 @@ type config struct {
 func main() {
 	// initial urls for lcoation data
 	baseURL := "https://pokeapi.co/api/v2/location-area/"
-	currentURL := "https://pokeapi.co/api/v2/location-area?offset=0&limit=20"
-	nextURL := "https://pokeapi.co/api/v2/location-area?offset=20&limit=20"
+	nextURL := "https://pokeapi.co/api/v2/location-area?offset=0&limit=20"
+	prevURL := ""
 
 	// create new HTTP client using custom wrapper. Timeout fails any requests that take longer than 5 seconds
 	cfg := &config{
 		pokeapiClient: pokeapi.NewClient(5 * time.Second),
-		baseURL:       &baseURL,
-		currentURL:    &currentURL,
-		nextURL:       &nextURL,
+		baseURL:       baseURL,
+		nextURL:       nextURL,
+		prevURL:       prevURL,
 		// also create cache to attach to config
 		cache: pokecache.NewCache(5 * time.Second),
 	}

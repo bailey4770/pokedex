@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
+
+	"github.com/bailey4770/pokedex/internal/pokeapi"
 )
 
 func commandExit(cfg *config) error {
@@ -25,7 +27,7 @@ func commandHelp(commands map[string]cliCommand) func(cfg *config) error {
 
 func commandMap(cfg *config) error {
 	if url := cfg.currentURL; url != nil {
-		locationData, err := cfg.pokeapiClient.GetLocationData(*url)
+		locationData, err := pokeapi.GetData[pokeapi.LocationResponse](&cfg.pokeapiClient, *url, cfg.cache)
 		if err != nil {
 			return err
 		}
@@ -47,7 +49,7 @@ func commandMap(cfg *config) error {
 
 func commandMapb(cfg *config) error {
 	if url := cfg.prevURL; url != nil {
-		locationData, err := cfg.pokeapiClient.GetLocationData(*url)
+		locationData, err := pokeapi.GetData[pokeapi.LocationResponse](&cfg.pokeapiClient, *url, cfg.cache)
 		if err != nil {
 			return err
 		}
@@ -65,4 +67,23 @@ func commandMapb(cfg *config) error {
 	} else {
 		return fmt.Errorf("you're on the first page")
 	}
+}
+
+func commandExplore(cfg *config) error {
+	args := cfg.args
+	if len(args) > 1 {
+		return fmt.Errorf("explore command takes one location area argument")
+	}
+
+	url := *cfg.baseURL + args[0]
+	pokemonData, err := pokeapi.GetData[pokeapi.PokemonListResponse](&cfg.pokeapiClient, url, cfg.cache)
+	if err != nil {
+		return err
+	}
+
+	for _, pokemon := range pokemonData.PokemonEncounters {
+		fmt.Println(pokemon.Pokemon.Name)
+	}
+
+	return nil
 }

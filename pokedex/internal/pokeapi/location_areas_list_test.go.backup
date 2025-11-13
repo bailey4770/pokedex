@@ -5,6 +5,8 @@ import (
 	"net/http/httptest"
 	"testing"
 	"time"
+
+	"github.com/bailey4770/pokedex/internal/pokecache"
 )
 
 // Helper function to create a client with zero timeout for testing
@@ -12,7 +14,7 @@ func testClient() Client {
 	return NewClient(0)
 }
 
-func TestGetLocationData_Success(t *testing.T) {
+func TestRequestFromURL_Success(t *testing.T) {
 	// Mock server returning valid JSON
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -29,9 +31,10 @@ func TestGetLocationData_Success(t *testing.T) {
 
 	server := httptest.NewServer(handler)
 	defer server.Close()
+	cache := pokecache.NewCache(5 * time.Second)
 
 	client := testClient()
-	data, err := client.GetLocationData(server.URL)
+	data, err := client.RequestFromURL(server.URL, cache)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -58,9 +61,10 @@ func TestGetLocationData_HTTPError(t *testing.T) {
 	})
 	server := httptest.NewServer(handler)
 	defer server.Close()
+	cache := pokecache.NewCache(5 * time.Second)
 
 	client := testClient()
-	_, err := client.GetLocationData(server.URL)
+	_, err := client.RequestFromURL(server.URL, cache)
 	if err == nil {
 		t.Fatalf("expected an error, got nil")
 	}
@@ -77,9 +81,10 @@ func TestGetLocationData_InvalidJSON(t *testing.T) {
 	})
 	server := httptest.NewServer(handler)
 	defer server.Close()
+	cache := pokecache.NewCache(5 * time.Second)
 
 	client := testClient()
-	_, err := client.GetLocationData(server.URL)
+	_, err := client.RequestFromURL(server.URL, cache)
 	if err == nil {
 		t.Fatalf("expected an error, got nil")
 	}
@@ -97,10 +102,11 @@ func TestGetLocationData_Timeout(t *testing.T) {
 	})
 	server := httptest.NewServer(handler)
 	defer server.Close()
+	cache := pokecache.NewCache(5 * time.Second)
 
 	// Create client with short timeout
 	client := NewClient(10 * time.Millisecond)
-	_, err := client.GetLocationData(server.URL)
+	_, err := client.RequestFromURL(server.URL, cache)
 	if err == nil {
 		t.Fatalf("expected timeout error, got nil")
 	}

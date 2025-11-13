@@ -43,6 +43,11 @@ func replLoop(cfg *config) {
 		"Displays the previous location areas",
 		commandMapb,
 	}
+	commands["explore"] = cliCommand{
+		"explore",
+		"Lists all pokemon found in this location area",
+		commandExplore,
+	}
 
 	for {
 		fmt.Print("Pokedex > ")
@@ -57,6 +62,7 @@ func replLoop(cfg *config) {
 			continue
 		}
 		first := parts[0]
+		cfg.args = parts[1:]
 
 		if command, ok := commands[first]; ok {
 			if err := command.callback(cfg); err != nil {

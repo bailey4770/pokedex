@@ -181,3 +181,8 @@ func commandPokedex(cfg *config) error {
 
 	return nil
 }
+
+func commandVersion(cfg *config) error {
+	fmt.Printf("Version %s\n", cfg.version)
+	return nil
+}

@@ -63,6 +63,11 @@ func replLoop(cfg *config) {
 		"Lists caught pokemon in the pokedex",
 		commandPokedex,
 	}
+	commands["version"] = cliCommand{
+		"version",
+		"Displays current pokedex version",
+		commandVersion,
+	}
 
 	for {
 		fmt.Print("Pokedex > ")

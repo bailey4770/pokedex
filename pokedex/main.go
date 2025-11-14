@@ -29,7 +29,7 @@ func main() {
 	// create new HTTP client using custom wrapper. Timeout fails any requests that take longer than 5 seconds
 	// create new cache using custom wrapper. Cache clears every 5 seconds to save space
 	cfg := &config{
-		version:       "1.0",
+		version:       "1.0.0",
 		pokeapiClient: pokeapi.NewClient(5 * time.Second),
 		baseURL:       baseURL,
 		nextURL:       nextURL,

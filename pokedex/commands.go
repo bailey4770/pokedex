@@ -34,6 +34,7 @@ func commandMap(cfg *config) error {
 			return err
 		}
 
+		// fmt.Printf("showing results for %s\n", cfg.nextURL)
 		for _, item := range locationData.Results {
 			fmt.Println(item.Name)
 		}
@@ -63,6 +64,7 @@ func commandMapb(cfg *config) error {
 			return err
 		}
 
+		// fmt.Printf("showing results for %s\n", cfg.prevURL)
 		for _, item := range locationData.Results {
 			fmt.Println(item.Name)
 		}
@@ -75,7 +77,7 @@ func commandMapb(cfg *config) error {
 		if locationData.Previous == nil {
 			cfg.prevURL = ""
 		} else {
-			cfg.prevURL = *locationData.Next
+			cfg.prevURL = *locationData.Previous
 		}
 
 		return nil
@@ -123,7 +125,7 @@ func commandCatch(cfg *config) error {
 
 	const k = 0.008
 	chance := math.Exp(-k * float64(pokemonStats.BaseExperience))
-	fmt.Printf("%s has base experience: %d. There is a %.3f%% chance of success\n", pokemon, pokemonStats.BaseExperience, chance)
+	fmt.Printf("%s has base experience: %d. There is a %.1f%% chance of success\n", pokemon, pokemonStats.BaseExperience, chance*100)
 	fmt.Printf("Throwing a Pokeball at %s...\n", pokemon)
 
 	diceRoll := rand.Float64()

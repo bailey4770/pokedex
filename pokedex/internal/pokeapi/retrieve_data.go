@@ -3,7 +3,6 @@ package pokeapi
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 
 	"github.com/bailey4770/pokedex/internal/pokecache"
 )
@@ -35,33 +34,6 @@ type Response interface {
 	LocationResponse | PokemonListResponse | PokemonStatsResponse
 }
 
-func unmarshallByteSlice[T Response](body []byte) (T, error) {
-	var responseData T
-
-	if err := json.Unmarshal(body, &responseData); err != nil {
-		return responseData, fmt.Errorf("unmarshalling response body: %w", err)
-	}
-
-	return responseData, nil
-}
-
-func cacheCheck[T Response](url string, cache *pokecache.Cache) (T, bool) {
-	var responseData T
-
-	body, ok := cache.Get(url)
-	if !ok {
-		return responseData, false
-	}
-
-	responseData, err := unmarshallByteSlice[T](body)
-	if err != nil {
-		log.Println(err)
-		return responseData, false
-	}
-
-	return responseData, true
-}
-
 func GetData[T Response](c *Client, url string, cache *pokecache.Cache) (T, error) {
 	// Typical pattern:
 	//     Create a client with timeouts.
@@ -71,9 +43,14 @@ func GetData[T Response](c *Client, url string, cache *pokecache.Cache) (T, erro
 	// Gives us more flexibility than http.Get. Also allows us to easily add other http requests in the future
 
 	var responseData T
+	defer fmt.Printf("returning %v\n", responseData)
 
 	// check first if data is stored in cache. we can return this and avoid http request
-	if responseData, ok := cacheCheck[T](url, cache); ok {
+	body, ok := cache.Get(url)
+	if ok {
+		if err := json.Unmarshal(body, &responseData); err != nil {
+			return responseData, fmt.Errorf("unmarshalling response body: %w", err)
+		}
 		return responseData, nil
 	}
 
@@ -86,8 +63,8 @@ func GetData[T Response](c *Client, url string, cache *pokecache.Cache) (T, erro
 	cache.Add(url, body)
 
 	// now unmarshal and return
-	if responseData, err = unmarshallByteSlice[T](body); err != nil {
-		return responseData, err
+	if err := json.Unmarshal(body, &responseData); err != nil {
+		return responseData, fmt.Errorf("unmarshalling response body: %w", err)
 	}
 
 	return responseData, nil

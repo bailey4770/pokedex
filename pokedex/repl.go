@@ -48,6 +48,11 @@ func replLoop(cfg *config) {
 		"Lists all pokemon found in this location area",
 		commandExplore,
 	}
+	commands["catch"] = cliCommand{
+		"catch",
+		"Attempts to catch a named pokemon to add to pokedex",
+		commandCatch,
+	}
 
 	for {
 		fmt.Print("Pokedex > ")

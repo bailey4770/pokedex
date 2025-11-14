@@ -27,8 +27,12 @@ type PokemonListResponse struct {
 	} `json:"pokemon_encounters"`
 }
 
+type PokemonStatsResponse struct {
+	BaseExperience int `json:"base_experience"`
+}
+
 type Response interface {
-	LocationResponse | PokemonListResponse
+	LocationResponse | PokemonListResponse | PokemonStatsResponse
 }
 
 func unmarshallByteSlice[T Response](body []byte) (T, error) {
@@ -49,7 +53,8 @@ func cacheCheck[T Response](url string, cache *pokecache.Cache) (T, bool) {
 		return responseData, false
 	}
 
-	if responseData, err := unmarshallByteSlice[T](body); err != nil {
+	responseData, err := unmarshallByteSlice[T](body)
+	if err != nil {
 		log.Println(err)
 		return responseData, false
 	}

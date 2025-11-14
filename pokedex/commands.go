@@ -2,7 +2,8 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"math"
+	"math/rand"
 	"os"
 
 	"github.com/bailey4770/pokedex/internal/pokeapi"
@@ -48,8 +49,6 @@ func commandMap(cfg *config) error {
 			cfg.nextURL = *locationData.Next
 		}
 
-		log.Printf("Next URL: %s, prevURL: %s", cfg.nextURL, cfg.prevURL)
-
 		return nil
 
 	} else {
@@ -92,7 +91,7 @@ func commandExplore(cfg *config) error {
 		return fmt.Errorf("explore command takes one location area argument")
 	}
 
-	url := cfg.baseURL + args[0]
+	url := cfg.baseURL + "location-area/" + args[0]
 	pokemonData, err := pokeapi.GetData[pokeapi.PokemonListResponse](&cfg.pokeapiClient, url, cfg.cache)
 	if err != nil {
 		return err
@@ -100,6 +99,43 @@ func commandExplore(cfg *config) error {
 
 	for _, pokemon := range pokemonData.PokemonEncounters {
 		fmt.Println(pokemon.Pokemon.Name)
+	}
+
+	return nil
+}
+
+func commandCatch(cfg *config) error {
+	args := cfg.args
+	if len(args) > 1 {
+		return fmt.Errorf("explore command takes one location area argument")
+	}
+	pokemon := args[0]
+
+	if _, exists := cfg.pokedex[pokemon]; exists {
+		return fmt.Errorf("%s is already in your pokedex", pokemon)
+	}
+
+	url := cfg.baseURL + "pokemon/" + pokemon
+	pokemonStats, err := pokeapi.GetData[pokeapi.PokemonStatsResponse](&cfg.pokeapiClient, url, cfg.cache)
+	if err != nil {
+		return err
+	}
+
+	const k = 0.008
+	chance := math.Exp(-k * float64(pokemonStats.BaseExperience))
+	fmt.Printf("%s has base experience: %d. There is a %.3f%% chance of success\n", pokemon, pokemonStats.BaseExperience, chance)
+	fmt.Printf("Throwing a Pokeball at %s...\n", pokemon)
+
+	diceRoll := rand.Float64()
+	if diceRoll < chance {
+		fmt.Printf("You successfully caught %s!\n", pokemon)
+		caught := Pokemon{
+			pokemon,
+			pokemonStats.BaseExperience,
+		}
+		cfg.pokedex[pokemon] = caught
+	} else {
+		fmt.Printf("You were unsuccessful in catching %s\n", pokemon)
 	}
 
 	return nil

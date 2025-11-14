@@ -53,6 +53,16 @@ func replLoop(cfg *config) {
 		"Attempts to catch a named pokemon to add to pokedex",
 		commandCatch,
 	}
+	commands["inspect"] = cliCommand{
+		"inspect",
+		"Takes the name of a pokemon and prints some statistics",
+		commandInspect,
+	}
+	commands["pokedex"] = cliCommand{
+		"pokedex",
+		"Lists caught pokemon in the pokedex",
+		commandPokedex,
+	}
 
 	for {
 		fmt.Print("Pokedex > ")

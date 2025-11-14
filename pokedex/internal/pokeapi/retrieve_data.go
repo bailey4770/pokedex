@@ -28,6 +28,19 @@ type PokemonListResponse struct {
 
 type PokemonStatsResponse struct {
 	BaseExperience int `json:"base_experience"`
+	Height         int `json:"height"`
+	Weight         int `json:"weight"`
+	Stats          []struct {
+		BaseStat int `json:"base_stat"`
+		Stat     struct {
+			Name string `json:"name"`
+		} `json:"stat"`
+	} `json:"stats"`
+	Types []struct {
+		Type struct {
+			Name string `json:"name"`
+		} `json:"type"`
+	} `json:"types"`
 }
 
 type Response interface {
@@ -43,7 +56,6 @@ func GetData[T Response](c *Client, url string, cache *pokecache.Cache) (T, erro
 	// Gives us more flexibility than http.Get. Also allows us to easily add other http requests in the future
 
 	var responseData T
-	defer fmt.Printf("returning %v\n", responseData)
 
 	// check first if data is stored in cache. we can return this and avoid http request
 	body, ok := cache.Get(url)

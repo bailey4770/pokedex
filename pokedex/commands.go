@@ -108,8 +108,8 @@ func commandExplore(cfg *config) error {
 
 func commandCatch(cfg *config) error {
 	args := cfg.args
-	if len(args) > 1 {
-		return fmt.Errorf("explore command takes one location area argument")
+	if len(args) != 1 {
+		return fmt.Errorf("catch command takes one pokemon name as an argument")
 	}
 	pokemon := args[0]
 
@@ -131,13 +131,52 @@ func commandCatch(cfg *config) error {
 	diceRoll := rand.Float64()
 	if diceRoll < chance {
 		fmt.Printf("You successfully caught %s!\n", pokemon)
-		caught := Pokemon{
-			pokemon,
-			pokemonStats.BaseExperience,
-		}
-		cfg.pokedex[pokemon] = caught
+		cfg.pokedex[pokemon] = pokemonStats
 	} else {
 		fmt.Printf("You were unsuccessful in catching %s\n", pokemon)
+	}
+
+	return nil
+}
+
+func commandInspect(cfg *config) error {
+	args := cfg.args
+	if len(args) != 1 {
+		return fmt.Errorf("inspect command takes one pokemon name as an argument")
+	}
+	pokemon := args[0]
+
+	pokemonStats, exists := cfg.pokedex[pokemon]
+	if !exists {
+		return fmt.Errorf("%s is not in your pokedex", pokemon)
+	}
+
+	fmt.Printf("Name: %s\n", pokemon)
+	fmt.Printf("Height: %d\n", pokemonStats.Height)
+	fmt.Printf("Weight: %d\n", pokemonStats.Weight)
+
+	fmt.Println("Stats:")
+	for _, stat := range pokemonStats.Stats {
+		fmt.Printf("- %s: %d\n", stat.Stat.Name, stat.BaseStat)
+	}
+	fmt.Println("Types:")
+	for _, t := range pokemonStats.Types {
+		fmt.Printf("- %s\n", t.Type.Name)
+	}
+
+	return nil
+}
+
+func commandPokedex(cfg *config) error {
+	pokedex := cfg.pokedex
+
+	if len(pokedex) == 0 {
+		return fmt.Errorf("pokedex is empty")
+	}
+
+	fmt.Println("Your pokedex:")
+	for name := range pokedex {
+		fmt.Printf("- %s\n", name)
 	}
 
 	return nil

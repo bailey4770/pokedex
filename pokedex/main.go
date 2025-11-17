@@ -39,5 +39,5 @@ func main() {
 	}
 
 	// initialise repl loop
-	replLoop(cfg)
+	startRepl(cfg)
 }

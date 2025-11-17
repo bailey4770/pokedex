@@ -4,6 +4,11 @@ A boot.dev guided project to build a pokedex in Go using the pokeAPI
 
 ## Change log
 
+### Added command history and tab-completion
+
+- Replaced the bufio.Scanner with a chyzer/readline.
+- Library comes with very easily configured history, with navigation by arrow keys, and tab completion
+
 ### Restructured command and repl structure
 
 - Original boot.dev split repl and many commands into separate files.
@@ -30,6 +35,5 @@ A boot.dev guided project to build a pokedex in Go using the pokeAPI
 
 ## To-do
 
-- store history of commands to cycle through with arrow keys.
 - store pokedex to disk so it persists between sessions.
 - level up catching ability to make it easier to catch harder pokemon.

@@ -1,14 +1,15 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
+	"log"
 	"math"
 	"math/rand"
 	"os"
 	"strings"
 
 	"github.com/bailey4770/pokedex/internal/pokeapi"
+	"github.com/chzyer/readline"
 )
 
 func cleanInput(text string) []string {
@@ -77,21 +78,41 @@ func getCommands() map[string]cliCommand {
 }
 
 func startRepl(cfg *config) {
-	scanner := bufio.NewScanner(os.Stdin)
 	commands := getCommands()
 
-	for {
-		fmt.Print("Pokedex > ")
+	completer := readline.NewPrefixCompleter()
+	for cmd := range commands {
+		completer.Children = append(completer.Children,
+			readline.PcItem(cmd),
+		)
+	}
 
-		if !scanner.Scan() {
+	rl, err := readline.NewEx(&readline.Config{
+		Prompt:          "Pokedex > ",
+		HistoryLimit:    1000,
+		InterruptPrompt: "^C",
+		EOFPrompt:       "exit",
+		AutoComplete:    completer,
+	})
+	if err != nil {
+		log.Fatalf("readline returned err: %v", err)
+	}
+	defer rl.Close()
+
+	for {
+		line, err := rl.Readline()
+		if err == readline.ErrInterrupt {
+			continue
+		} else if err != nil {
+			log.Fatalf("error reading input: %v", err)
 			return
 		}
 
-		input := scanner.Text()
-		parts := cleanInput(input)
+		parts := cleanInput(line)
 		if len(parts) == 0 {
 			continue
 		}
+
 		first := parts[0]
 		cfg.args = parts[1:]
 

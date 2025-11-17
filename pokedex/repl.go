@@ -73,6 +73,11 @@ func getCommands() map[string]cliCommand {
 		"Displays current pokedex version",
 		commandVersion,
 	}
+	commands["reset"] = cliCommand{
+		"reset",
+		"Resets pokedex to empty",
+		commandReset,
+	}
 
 	return commands
 }
@@ -127,7 +132,13 @@ func startRepl(cfg *config) {
 }
 
 func commandExit(cfg *config) error {
+	if err := savePokedex(cfg); err != nil {
+		fmt.Printf("Error saving the pokedex: %v/n", err)
+	} else {
+		fmt.Println("Successfully saved pokedex.")
+	}
 	fmt.Println("Closing the Pokedex... Goodbye!")
+
 	os.Exit(0)
 	return nil
 }
@@ -206,7 +217,7 @@ func commandMapb(cfg *config) error {
 
 func commandExplore(cfg *config) error {
 	args := cfg.args
-	if len(args) > 1 {
+	if len(args) != 1 {
 		return fmt.Errorf("explore command takes one location area argument")
 	}
 
@@ -301,5 +312,12 @@ func commandPokedex(cfg *config) error {
 
 func commandVersion(cfg *config) error {
 	fmt.Printf("Version %s\n", cfg.version)
+	return nil
+}
+
+func commandReset(cfg *config) error {
+	fmt.Println("Clearing pokedex...")
+	_ = resetPokedex(cfg)
+
 	return nil
 }

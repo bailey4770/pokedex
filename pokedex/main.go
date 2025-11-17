@@ -1,11 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/bailey4770/pokedex/internal/pokeapi"
 	"github.com/bailey4770/pokedex/internal/pokecache"
 )
+
+type pokedexType map[string]pokeapi.PokemonStatsResponse
 
 type config struct {
 	version       string
@@ -15,7 +18,7 @@ type config struct {
 	prevURL       string
 	cache         *pokecache.Cache
 	args          []string
-	pokedex       map[string]pokeapi.PokemonStatsResponse
+	pokedex       pokedexType
 }
 
 func main() {
@@ -23,8 +26,6 @@ func main() {
 	baseURL := "https://pokeapi.co/api/v2/"
 	nextURL := "https://pokeapi.co/api/v2/location-area?offset=0&limit=20"
 	prevURL := ""
-
-	pokedex := make(map[string]pokeapi.PokemonStatsResponse)
 
 	// create new HTTP client using custom wrapper. Timeout fails any requests that take longer than 5 seconds
 	// create new cache using custom wrapper. Cache clears every 5 seconds to save space
@@ -35,7 +36,12 @@ func main() {
 		nextURL:       nextURL,
 		prevURL:       prevURL,
 		cache:         pokecache.NewCache(5 * time.Second),
-		pokedex:       pokedex,
+		pokedex:       make(pokedexType),
+	}
+
+	err := loadPokedex(cfg)
+	if err != nil {
+		fmt.Println(err)
 	}
 
 	// initialise repl loop

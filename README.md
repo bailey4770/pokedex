@@ -4,6 +4,12 @@ A boot.dev guided project to build a pokedex in Go using the pokeAPI
 
 ## Change log
 
+### Store pokedex to disk between sessions
+
+- Program stores pokedex to file using gob (encodes go structs) when exit command is executed.
+- Loads pokedex file at start up.
+- New reset command allows user to clear pokedex.
+
 ### Added command history and tab-completion
 
 - Replaced the bufio.Scanner with a chyzer/readline.
@@ -11,9 +17,9 @@ A boot.dev guided project to build a pokedex in Go using the pokeAPI
 
 ### Restructured command and repl structure
 
-- Original boot.dev split repl and many commands into separate files.
-- This meant the addition of new commands involved multiple files.
-- By combining the repl and commands functions to one file, adding new commands is easier.
+- Originally, commands were added to the callback map in repl.go but declared in commands.go.
+- Addition of a getCommands() func cleans up repl.go file.
+- Now maintainers can add new commands from just the commands.go file. No annoying file switching is necessary.
 
 ### Refactored the http request function
 

@@ -13,7 +13,7 @@ import (
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config) error
+	callback    func(*config, []string) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -74,8 +74,13 @@ func getCommands() map[string]cliCommand {
 	return commands
 }
 
-func commandExit(cfg *config) error {
+func commandExit(cfg *config, args []string) error {
+	if len(args) != 0 {
+		return fmt.Errorf("exit command was not expecting any arguments")
+	}
+
 	if err := savePokedex(cfg); err != nil {
+		// print rather than return since we don't want to be stuck unable to exit if there is a saving problem
 		fmt.Printf("Error saving the pokedex: %v/n", err)
 	} else {
 		fmt.Println("Successfully saved pokedex.")
@@ -86,8 +91,12 @@ func commandExit(cfg *config) error {
 	return nil
 }
 
-func commandHelp(commands map[string]cliCommand) func(cfg *config) error {
-	return func(cfg *config) error {
+func commandHelp(commands map[string]cliCommand) func(cfg *config, args []string) error {
+	return func(cfg *config, args []string) error {
+		if len(args) != 0 {
+			return fmt.Errorf("help command was not expecting any arguments")
+		}
+
 		fmt.Println("Welcome to the Pokedex!\nUsage:")
 		fmt.Println()
 
@@ -98,7 +107,11 @@ func commandHelp(commands map[string]cliCommand) func(cfg *config) error {
 	}
 }
 
-func commandMap(cfg *config) error {
+func commandMap(cfg *config, args []string) error {
+	if len(args) != 0 {
+		return fmt.Errorf("map command was not expecting any arguments")
+	}
+
 	if cfg.nextURL != "" {
 		locationData, err := pokeapi.GetData[pokeapi.LocationResponse](&cfg.pokeapiClient, cfg.nextURL, cfg.cache)
 		if err != nil {
@@ -128,7 +141,11 @@ func commandMap(cfg *config) error {
 	}
 }
 
-func commandMapb(cfg *config) error {
+func commandMapb(cfg *config, args []string) error {
+	if len(args) != 0 {
+		return fmt.Errorf("mapb command was not expecting any arguments")
+	}
+
 	if cfg.prevURL != "" {
 		locationData, err := pokeapi.GetData[pokeapi.LocationResponse](&cfg.pokeapiClient, cfg.prevURL, cfg.cache)
 		if err != nil {
@@ -158,8 +175,7 @@ func commandMapb(cfg *config) error {
 	}
 }
 
-func commandExplore(cfg *config) error {
-	args := cfg.args
+func commandExplore(cfg *config, args []string) error {
 	if len(args) != 1 {
 		return fmt.Errorf("explore command takes one location area argument")
 	}
@@ -177,8 +193,7 @@ func commandExplore(cfg *config) error {
 	return nil
 }
 
-func commandCatch(cfg *config) error {
-	args := cfg.args
+func commandCatch(cfg *config, args []string) error {
 	if len(args) != 1 {
 		return fmt.Errorf("catch command takes one pokemon name as an argument")
 	}
@@ -210,8 +225,7 @@ func commandCatch(cfg *config) error {
 	return nil
 }
 
-func commandInspect(cfg *config) error {
-	args := cfg.args
+func commandInspect(cfg *config, args []string) error {
 	if len(args) != 1 {
 		return fmt.Errorf("inspect command takes one pokemon name as an argument")
 	}
@@ -238,7 +252,10 @@ func commandInspect(cfg *config) error {
 	return nil
 }
 
-func commandPokedex(cfg *config) error {
+func commandPokedex(cfg *config, args []string) error {
+	if len(args) != 0 {
+		return fmt.Errorf("pokedex command was not expecting any arguments")
+	}
 	pokedex := cfg.pokedex
 
 	if len(pokedex) == 0 {
@@ -253,12 +270,20 @@ func commandPokedex(cfg *config) error {
 	return nil
 }
 
-func commandVersion(cfg *config) error {
-	fmt.Printf("Version %s\n", cfg.version)
+func commandVersion(_ *config, args []string) error {
+	if len(args) != 0 {
+		return fmt.Errorf("version command was not expecting any arguments")
+	}
+
+	fmt.Printf("Version %s\n", VERSION)
 	return nil
 }
 
-func commandReset(cfg *config) error {
+func commandReset(cfg *config, args []string) error {
+	if len(args) != 0 {
+		return fmt.Errorf("reset command was not expecting any arguments")
+	}
+
 	fmt.Println("Clearing pokedex...")
 	_ = resetPokedex(cfg)
 

@@ -50,10 +50,10 @@ func startRepl(cfg *config) {
 		}
 
 		first := parts[0]
-		cfg.args = parts[1:]
+		args := parts[1:]
 
 		if command, ok := commands[first]; ok {
-			if err := command.callback(cfg); err != nil {
+			if err := command.callback(cfg, args); err != nil {
 				fmt.Println("Error:", err)
 			}
 		} else {

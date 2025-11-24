@@ -8,16 +8,16 @@ import (
 	"github.com/bailey4770/pokedex/internal/pokecache"
 )
 
+var VERSION string = "1.1.2"
+
 type pokedexType map[string]pokeapi.PokemonStatsResponse
 
 type config struct {
-	version       string
 	pokeapiClient pokeapi.Client
 	baseURL       string
 	nextURL       string
 	prevURL       string
 	cache         *pokecache.Cache
-	args          []string
 	pokedex       pokedexType
 }
 
@@ -30,7 +30,6 @@ func main() {
 	// create new HTTP client using custom wrapper. Timeout fails any requests that take longer than 5 seconds
 	// create new cache using custom wrapper. Cache clears every 5 seconds to save space
 	cfg := &config{
-		version:       "1.1.1",
 		pokeapiClient: pokeapi.NewClient(5 * time.Second),
 		baseURL:       baseURL,
 		nextURL:       nextURL,

@@ -11,7 +11,7 @@ Alternatively, if you prefer to build from source, or are not running on Linux:
 
 - clone source code into a local directory.
 - ensure go tool chain is downloaded.
-- run `go build`. The command should build the appropriate binary for your OS.
+- run `go build`. The command should build the appropriate binary for your OS and architecture.
 - run the resulting binary.
 
 If you find any bugs, please email me <bailey4770@outlook.com>

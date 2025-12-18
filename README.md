@@ -6,6 +6,7 @@ A boot.dev guided project to build a pokedex in Go using the pokeAPI
 
 Simply download the latest release and run the binary.
 You may have to `chmod +x pokedex` in order to run it (if using Linux).
+
 Alternatively, if you prefer to build from source, or are not running on Linux:
 
 - clone source code into a local directory.

@@ -1,6 +1,19 @@
-# pokedex
+# Pokedex
 
 A boot.dev guided project to build a pokedex in Go using the pokeAPI
+
+## How to run
+
+Simply download the latest release and run the binary.
+You may have to `chmod +x pokedex` in order to run it (if using Linux).
+Alternatively, if you prefer to build from source, or are not running on Linux:
+
+- clone source code into a local directory.
+- ensure go tool chain is downloaded.
+- run `go build`. The command should build the appropriate binary for your OS.
+- run the resulting binary.
+
+If you find any bugs, please email me <bailey4770@outlook.com>
 
 ## Change log
 
@@ -41,5 +54,4 @@ A boot.dev guided project to build a pokedex in Go using the pokeAPI
 
 ## To-do
 
-- store pokedex to disk so it persists between sessions.
 - level up catching ability to make it easier to catch harder pokemon.
